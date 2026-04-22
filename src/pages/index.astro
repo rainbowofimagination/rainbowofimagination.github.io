@@ -27,11 +27,13 @@ const base = import.meta.env.BASE_URL;
 const withBase = (segment = '') => `${base}${segment.replace(/^\/+/, '')}`;
 ---
 
-<BaseLayout title="Mihika Sharma — Poems & Essays">
+<BaseLayout title="Mihika Sharma — Poems, Essays & Arts">
   <section class="hero animate-in">
     <p class="hero__eyebrow">Writing & Thought of</p>
     <div class="hero__body">
-      <h1 class="hero__title">Mihika Sharma</h1>
+      <h1 class="hero__title">
+        <a class="hero__title-link" href={withBase('/about')}>Mihika Sharma</a>
+      </h1>
       <p class="hero__subtitle">
         A space for poems, essays, and longer reflections on whatever occupies the mind.
       </p>

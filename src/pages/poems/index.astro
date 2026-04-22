@@ -30,7 +30,7 @@ const withBase = (segment = '') => `${base}${segment.replace(/^\/+/, '')}`;
         <li class="post-list__item animate-in">
           <div>
             <p class="post-list__title">
-              <a href={withBase(`poems/${poem.slug}`)}>{poem.data.title}</a>
+              <a href={withBase(`poems/${poem.id}`)}>{poem.data.title}</a>
             </p>
             {poem.data.description && (
               <p class="post-list__desc">{poem.data.description}</p>
