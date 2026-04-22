@@ -4,8 +4,8 @@ import sitemap from '@astrojs/sitemap';
 
 // Replace with your GitHub Pages URL: https://<username>.github.io/<repo>/
 export default defineConfig({
-  site: 'https://yourusername.github.io',
-  base: '/your-repo-name',
+  site: 'https://rainbowofimagination.github.io',
+  base: '/rainbowofimagination.github.io',
   integrations: [mdx(), sitemap()],
   markdown: {
     shikiConfig: {
