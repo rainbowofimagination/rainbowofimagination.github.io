@@ -7,11 +7,11 @@ const withBase = (segment = '') => `${base}${segment.replace(/^\/+/, '')}`;
 
 <BaseLayout title="About — Mihika Sharma">
   <div class="about-grid animate-in">
-    <aside>
+    <aside class="about-sidebar-card">
       <img
         src={withBase('profile.JPG')}
         alt="Mihika Sharma"
-        style="width:100%; margin-bottom:1.75rem; display:block;"
+        style="width:100%; margin-bottom:0.3rem; display:block; border-radius:10px;"
       />
       <p class="about-sidebar__name">Mihika Sharma</p>
       <p class="about-sidebar__label">Learning to learn</p>
@@ -32,8 +32,8 @@ const withBase = (segment = '') => `${base}${segment.replace(/^\/+/, '')}`;
         rainbow_of_imagination
       </a>
       <p style="font-size:0.85rem; color:var(--ink-soft); line-height:1.7">
-        Bothell, Washington, USA<br />
-        <a href="mailto:you@example.com">you@example.com</a>
+        Washington, USA<br />
+        <a href="mailto:you@example.com">yoshita2012@gmail.com</a>
       </p>
     </aside>
 
