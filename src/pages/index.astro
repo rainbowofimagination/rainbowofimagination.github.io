@@ -15,18 +15,19 @@ const articles = (await getCollection('articles', ({ data }) => !data.draft))
   .slice(0, 4);
 
 const highlighted = [
-  ...(await getCollection('poems',   ({ data }) => !data.draft && data.featured)).map(e => ({ ...e, kind: 'Poem'    as const })),
+  ...(await getCollection('poems', ({ data }) => !data.draft && data.featured)).map(e => ({ ...e, kind: 'Poem' as const })),
   ...(await getCollection('articles', ({ data }) => !data.draft && data.featured)).map(e => ({ ...e, kind: 'Article' as const })),
 ].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 function formatDate(d: Date) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
+
 const base = import.meta.env.BASE_URL;
+const withBase = (segment = '') => `${base}${segment.replace(/^\/+/, '')}`;
 ---
 
 <BaseLayout title="Mihika Sharma — Poems & Essays">
-  <!-- Hero -->
   <section class="hero animate-in">
     <p class="hero__eyebrow">Writing & Thought of</p>
     <div class="hero__body">
@@ -37,7 +38,6 @@ const base = import.meta.env.BASE_URL;
     </div>
   </section>
 
-  <!-- Highlighted Works -->
   {highlighted.length > 0 && (
     <section>
       <div class="section-header">
@@ -49,7 +49,7 @@ const base = import.meta.env.BASE_URL;
             <div>
               <span style="font-family:var(--font-label);font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:0.25rem;">{item.kind}</span>
               <p class="post-list__title">
-                <a href={`${base}/${item.kind === 'Poem' ? 'poems' : 'articles'}/${item.slug}`}>{item.data.title}</a>
+                <a href={withBase(`${item.kind === 'Poem' ? 'poems' : 'articles'}/${item.slug}`)}>{item.data.title}</a>
               </p>
               {item.data.description && (
                 <p class="post-list__desc">{item.data.description}</p>
@@ -62,7 +62,6 @@ const base = import.meta.env.BASE_URL;
     </section>
   )}
 
-  <!-- Recent Poems -->
   <section>
     <div class="section-header">
       <h2>Recent Poems</h2>
@@ -75,7 +74,7 @@ const base = import.meta.env.BASE_URL;
           <li class="post-list__item animate-in">
             <div>
               <p class="post-list__title">
-                <a href={`${base}/poems/${poem.slug}`}>{poem.data.title}</a>
+                <a href={withBase(`poems/${poem.slug}`)}>{poem.data.title}</a>
               </p>
               {poem.data.description && (
                 <p class="post-list__desc">{poem.data.description}</p>
@@ -87,13 +86,12 @@ const base = import.meta.env.BASE_URL;
       </ul>
     )}
     <p style="margin-top:1.5rem">
-      <a href={`${base}/poems`} style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;">
+      <a href={withBase('poems')} style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;">
         All poems →
       </a>
     </p>
   </section>
 
-  <!-- Recent Articles -->
   <section>
     <div class="section-header">
       <h2>Recent Articles</h2>
@@ -106,7 +104,7 @@ const base = import.meta.env.BASE_URL;
           <li class="post-list__item animate-in">
             <div>
               <p class="post-list__title">
-                <a href={`${base}/articles/${article.slug}`}>{article.data.title}</a>
+                <a href={withBase(`articles/${article.slug}`)}>{article.data.title}</a>
               </p>
               {article.data.description && (
                 <p class="post-list__desc">{article.data.description}</p>
@@ -118,13 +116,12 @@ const base = import.meta.env.BASE_URL;
       </ul>
     )}
     <p style="margin-top:1.5rem">
-      <a href={`${base}/articles`} style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;">
+      <a href={withBase('articles')} style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;">
         All articles →
       </a>
     </p>
   </section>
 
-  <!-- Recent Artworks -->
   <section>
     <div class="section-header">
       <h2>Recent Artworks</h2>
@@ -137,13 +134,13 @@ const base = import.meta.env.BASE_URL;
           <div class="artwork-strip__card animate-in">
             <a
               class="artwork-strip__img-link"
-              href={`${base}/artworks/${art.data.image}`}
+              href={withBase(`artworks/${art.data.image}`)}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`View full size: ${art.data.title}`}
             >
               <img
-                src={`${base}/artworks/${art.data.image}`}
+                src={withBase(`artworks/${art.data.image}`)}
                 alt={art.data.title}
                 class="artwork-strip__img"
                 loading="lazy"
@@ -155,7 +152,7 @@ const base = import.meta.env.BASE_URL;
       </div>
     )}
     <p style="margin-top:1.5rem">
-      <a href={`${base}/artworks`} style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;">
+      <a href={withBase('artworks')} style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;">
         All artworks →
       </a>
     </p>
