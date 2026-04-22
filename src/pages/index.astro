@@ -17,7 +17,9 @@ const articles = (await getCollection('articles', ({ data }) => !data.draft))
 const highlighted = [
   ...(await getCollection('poems', ({ data }) => !data.draft && data.featured)).map(e => ({ ...e, kind: 'Poem' as const })),
   ...(await getCollection('articles', ({ data }) => !data.draft && data.featured)).map(e => ({ ...e, kind: 'Article' as const })),
-].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+]
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 10);
 
 function formatDate(d: Date) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -41,28 +43,61 @@ const withBase = (segment = '') => `${base}${segment.replace(/^\/+/, '')}`;
   </section>
 
   {highlighted.length > 0 && (
-  <section class="section-card">
-      <div class="section-header">
-        <h2>Highlighted Works</h2>
-      </div>
-      <ul class="post-list">
-        {highlighted.map(item => (
-          <li class="post-list__item animate-in" style="border-left: 2px solid var(--gold); padding-left: 1.25rem;">
-            <div>
-              <span style="font-family:var(--font-label);font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:0.25rem;">{item.kind}</span>
-              <p class="post-list__title">
-                <a href={withBase(`${item.kind === 'Poem' ? 'poems' : 'articles'}/${item.id}`)}>{item.data.title}</a>
-              </p>
+  <section class="highlight-slider-section">
+    <div class="section-header">
+      <h2>Highlighted Works</h2>
+    </div>
+
+    <div class="highlight-slider" id="highlightSlider" tabindex="0">
+      <div class="slider-track" id="highlightSliderTrack">
+        {highlighted.map((item, i) => (
+          <article class="slide highlight-slide animate-in" data-index={i}>
+            <div class="highlight-slide__inner">
+              <p class="highlight-slide__kind">{item.kind}</p>
+
+              <h3 class="highlight-slide__title">
+                <a href={withBase(`/${item.kind === 'Poem' ? 'poems' : 'articles'}/${item.id}`)}>
+                  {item.data.title}
+                </a>
+              </h3>
+
               {item.data.description && (
-                <p class="post-list__desc">{item.data.description}</p>
+                <p class="highlight-slide__desc">{item.data.description}</p>
               )}
+
+              <p class="highlight-slide__meta">{formatDate(item.data.date)}</p>
             </div>
-            <span class="post-list__date">{formatDate(item.data.date)}</span>
-          </li>
+          </article>
         ))}
-      </ul>
-    </section>
-  )}
+      </div>
+
+      {highlighted.length > 1 && (
+        <>
+          <button class="slider-btn slider-btn--prev" id="highlightSliderPrev" aria-label="Previous highlighted work">
+            &#8592;
+          </button>
+          <button class="slider-btn slider-btn--next" id="highlightSliderNext" aria-label="Next highlighted work">
+            &#8594;
+          </button>
+        </>
+      )}
+    </div>
+
+    {highlighted.length > 1 && (
+      <div class="slider-dots" id="highlightSliderDots" role="tablist" aria-label="Highlighted works navigation">
+        {highlighted.map((item, i) => (
+          <button
+            class="slider-dot"
+            data-highlight-dot={i}
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-label={`Go to ${item.data.title}`}
+          ></button>
+        ))}
+      </div>
+    )}
+  </section>
+)}
 
   <section>
     <div class="section-header">
@@ -160,3 +195,91 @@ const withBase = (segment = '') => `${base}${segment.replace(/^\/+/, '')}`;
     </p>
   </section>
 </BaseLayout>
+
+<script>
+  const track = document.getElementById('highlightSliderTrack') as HTMLElement | null;
+  const dots = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-highlight-dot]'));
+  const total = dots.length;
+
+  if (track && total > 0) {
+    let current = 0;
+    let timer = 0;
+
+    function goTo(index: number) {
+      current = ((index % total) + total) % total;
+      track!.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => {
+        const active = i === current;
+        d.classList.toggle('active', active);
+        d.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    function startAuto() {
+      if (total < 2) return;
+      timer = window.setInterval(() => goTo(current + 1), 5000);
+    }
+
+    function resetAuto() {
+      window.clearInterval(timer);
+      startAuto();
+    }
+
+    document.getElementById('highlightSliderPrev')?.addEventListener('click', () => {
+      goTo(current - 1);
+      resetAuto();
+    });
+
+    document.getElementById('highlightSliderNext')?.addEventListener('click', () => {
+      goTo(current + 1);
+      resetAuto();
+    });
+
+    dots.forEach((dot, i) =>
+      dot.addEventListener('click', () => {
+        goTo(i);
+        resetAuto();
+      })
+    );
+
+    document.getElementById('highlightSlider')?.addEventListener('mouseenter', () => window.clearInterval(timer));
+    document.getElementById('highlightSlider')?.addEventListener('mouseleave', startAuto);
+
+    document.getElementById('highlightSlider')?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        goTo(current - 1);
+        resetAuto();
+      }
+      if (e.key === 'ArrowRight') {
+        goTo(current + 1);
+        resetAuto();
+      }
+    });
+
+    let touchStartX = 0;
+    const slider = document.getElementById('highlightSlider');
+
+    slider?.addEventListener(
+      'touchstart',
+      (e: TouchEvent) => {
+        touchStartX = e.touches[0].clientX;
+      },
+      { passive: true }
+    );
+
+    slider?.addEventListener(
+      'touchend',
+      (e: TouchEvent) => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) {
+          goTo(diff > 0 ? current + 1 : current - 1);
+          resetAuto();
+        }
+      },
+      { passive: true }
+    );
+
+    goTo(0);
+    startAuto();
+  }
+</script>
