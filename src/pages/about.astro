@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="About — Mihika Sharma">
+  <div class="about-grid animate-in">
+    <aside>
+      <img
+        src={`${base}/profile.JPG`}
+        alt="Mihika Sharma"
+        style="width:100%; margin-bottom:1.75rem; display:block;"
+      />
+      <p class="about-sidebar__name">Mihika Sharma</p>
+      <p class="about-sidebar__label">Learning to learn</p>
+      <div class="decorative-rule"></div>
+      <a
+        href="https://www.instagram.com/rainbow_of_imagination/"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="display:inline-flex; align-items:center; gap:0.45rem; font-family:var(--font-label); font-size:0.62rem; letter-spacing:0.13em; text-transform:uppercase; text-decoration:none; color:var(--ink-soft); margin-bottom:0.9rem; transition:color 0.2s;"
+        onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--ink-soft)'"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+        </svg>
+        rainbow_of_imagination
+      </a>
+      <p style="font-size:0.85rem; color:var(--ink-soft); line-height:1.7">
+        Bothell, Washington, USA<br />
+        <a href="mailto:you@example.com">you@example.com</a>
+      </p>
+    </aside>
+
+    <div class="prose">
+      <p>
+        Write a short biographical note here. This is where you tell readers who you are —
+        your background, your interests, what draws you to writing poems and essays.
+      </p>
+      <!-- <p>
+        This page is yours to shape. Keep it spare, or let it breathe into something longer.
+        The form follows the thought.
+      </p> -->
+      <hr />
+      <h2>Publications</h2>
+      <p>
+        List any journals, magazines, or venues where your work has appeared.
+        You can use simple bullet points or a running prose list — whatever fits your style.
+      </p>
+      <h2>Education</h2>
+      <p>
+        Your academic background, if you wish to share it.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

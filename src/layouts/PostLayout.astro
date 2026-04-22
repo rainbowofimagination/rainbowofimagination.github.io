@@ -1,0 +1,45 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  tags?: string[];
+  type: 'Poem' | 'Article';
+  backHref: string;
+  backLabel: string;
+}
+
+const { title, description, date, tags, type, backHref, backLabel } = Astro.props;
+
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title={`${title} — Your Name`} description={description}>
+  <div class={`container--narrow${type === 'Poem' ? ' poem-page' : ''}`} style="margin-inline:auto">
+    <a href={`${base}${backHref}`} class="back-link">{backLabel}</a>
+
+    <header class="post-header animate-in">
+      <h1 class="post-header__title">{title}</h1>
+      <p class="post-header__meta">{formattedDate}</p>
+      {description && <p class="post-header__desc">{description}</p>}
+      {tags && tags.length > 0 && (
+        <div class="tags" style="margin-top:0.5rem">
+          {tags.map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class={`prose${type === 'Poem' ? ' prose--poem' : ''}`}>
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

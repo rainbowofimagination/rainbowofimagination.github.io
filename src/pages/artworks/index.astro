@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allArtworks = (await getCollection('artworks', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const featured = allArtworks.filter(a => a.data.featured).slice(0, 10);
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+}
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="Artworks" description="A collection of original artworks.">
+
+  <!-- Page hero -->
+  <section class="hero animate-in">
+    <p class="hero__eyebrow">Studio & Canvas</p>
+    <div class="hero__body">
+      <h1 class="hero__title">Artworks</h1>
+      <p class="hero__subtitle">
+        A collected record of paintings, studies, and visual work — arranged by date.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Featured Slider ───────────────────────── -->
+  {featured.length > 0 && (
+    <div class="artwork-slider-section">
+      <div class="artwork-slider" id="artworkSlider">
+        <div class="slider-track" id="sliderTrack">
+          {featured.map((art, i) => (
+            <div class="slide" data-index={i}>
+              <a
+                class="slide__img-link"
+                href={`${base}/artworks/${art.data.image}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`View full size: ${art.data.title}`}
+              >
+                <img
+                  src={`${base}/artworks/${art.data.image}`}
+                  alt={art.data.title}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                />
+              </a>
+              <div class="slide__caption">
+                {art.data.medium && (
+                  <p class="slide__medium">{art.data.medium}</p>
+                )}
+                <p class="slide__title">{art.data.title}</p>
+                {art.data.description && (
+                  <p class="slide__desc">{art.data.description}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button class="slider-btn slider-btn--prev" id="sliderPrev" aria-label="Previous artwork">&#8592;</button>
+        <button class="slider-btn slider-btn--next" id="sliderNext" aria-label="Next artwork">&#8594;</button>
+      </div>
+
+      <!-- Dots bar sits below the slider image -->
+      <div class="slider-dots" id="sliderDots" role="tablist" aria-label="Slider navigation">
+        {featured.map((art, i) => (
+          <button
+            class="slider-dot"
+            data-dot={i}
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-label={`Go to ${art.data.title}`}
+          ></button>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- ── All Artworks Grid ──────────────────────── -->
+  <section>
+    <div class="section-header">
+      <h2>All Works</h2>
+    </div>
+
+    {allArtworks.length === 0 ? (
+      <p style="color:var(--ink-soft); font-style:italic; padding-bottom:4rem;">No artworks yet — add markdown files to src/content/artworks/ to get started.</p>
+    ) : (
+      <div class="artwork-grid">
+        {allArtworks.map((art) => (
+          <div class="artwork-card animate-in">
+            <a
+              class="artwork-card__img-link"
+              href={`${base}/artworks/${art.data.image}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`View full size: ${art.data.title}`}
+            >
+              <img
+                src={`${base}/artworks/${art.data.image}`}
+                alt={art.data.title}
+                class="artwork-card__img"
+                loading="lazy"
+              />
+            </a>
+            <div class="artwork-card__body">
+              <p class="artwork-card__title">{art.data.title}</p>
+              {art.data.medium && (
+                <p class="artwork-card__medium">{art.data.medium}</p>
+              )}
+              {art.data.description && (
+                <p class="artwork-card__desc">{art.data.description}</p>
+              )}
+              <p class="artwork-card__date">{formatDate(art.data.date)}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<script>
+  const track = document.getElementById('sliderTrack') as HTMLElement | null;
+  const dots  = Array.from(document.querySelectorAll<HTMLButtonElement>('.slider-dot'));
+  const total = dots.length;
+
+  if (track && total > 0) {
+    let current = 0;
+    let timer   = 0;
+
+    function goTo(index: number) {
+      current = ((index % total) + total) % total;
+      track!.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => {
+        const active = i === current;
+        d.classList.toggle('active', active);
+        d.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    function startAuto() {
+      if (total < 2) return;
+      timer = window.setInterval(() => goTo(current + 1), 4500);
+    }
+
+    function resetAuto() {
+      window.clearInterval(timer);
+      startAuto();
+    }
+
+    document.getElementById('sliderPrev')?.addEventListener('click', () => { goTo(current - 1); resetAuto(); });
+    document.getElementById('sliderNext')?.addEventListener('click', () => { goTo(current + 1); resetAuto(); });
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); resetAuto(); }));
+
+    // Pause on hover
+    document.getElementById('artworkSlider')?.addEventListener('mouseenter', () => window.clearInterval(timer));
+    document.getElementById('artworkSlider')?.addEventListener('mouseleave', startAuto);
+
+    // Keyboard navigation
+    document.getElementById('artworkSlider')?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft')  { goTo(current - 1); resetAuto(); }
+      if (e.key === 'ArrowRight') { goTo(current + 1); resetAuto(); }
+    });
+
+    // Touch / swipe support
+    let touchStartX = 0;
+    const slider = document.getElementById('artworkSlider');
+    slider?.addEventListener('touchstart', (e: TouchEvent) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    slider?.addEventListener('touchend', (e: TouchEvent) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) { goTo(diff > 0 ? current + 1 : current - 1); resetAuto(); }
+    }, { passive: true });
+
+    goTo(0);
+    startAuto();
+  }
+</script>
