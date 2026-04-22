@@ -97,7 +97,7 @@ hr {
 
 /* ── Site Header ─────────────────────────────── */
 .site-header {
-  padding-block: 2rem;
+  padding-block: 1rem 0.75rem;
   border-bottom: 1px solid var(--rule);
   display: flex;
   align-items: baseline;
@@ -160,8 +160,12 @@ hr {
 
 /* ── Hero ────────────────────────────────────── */
 .hero {
-  padding-block: 1.5rem 1.25rem;
-  border-bottom: 1px solid var(--rule);
+  padding: 1.4rem 1.5rem 1.25rem;
+  margin-bottom: 0;
+  background: var(--cream-mid);
+  border: 1px solid rgba(28, 26, 23, 0.10);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(28, 26, 23, 0.05);
 }
 
 .hero__eyebrow {
@@ -708,4 +712,28 @@ hr {
 .hero__title-link:hover {
   text-decoration: underline;
   text-underline-offset: 0.12em;
+}
+
+.section-card {
+  padding: 1.25rem 1.5rem 1.1rem;
+  margin: 0.4rem 0 1.2rem;
+  background: var(--cream-mid);
+  border: 1px solid rgba(28, 26, 23, 0.10);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(28, 26, 23, 0.05);
+}
+
+.section-card .post-list__item:first-child {
+  border-top: none;
+}
+
+.section-card .post-list__item:last-child {
+  border-bottom: none;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-top: 0;
 }
